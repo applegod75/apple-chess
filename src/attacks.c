@@ -1,0 +1,184 @@
+#include "attacks.h"
+
+
+void compute_knight_attacks(uint64_t knight_attacks[64]){
+    for(int i = 0; i < 64; i++){
+        knight_attacks[i] = generate_knight_attack(i);
+    }
+}
+
+void compute_king_attacks(uint64_t king_attacks[64]){
+    for (int i = 0; i < 64; i++){
+        king_attacks[i] = generate_king_attack(i);
+    }
+}
+
+void compute_pawn_attacks(uint64_t pawn_attacks[2][64]){
+    for(int i = 0; i < 64; i++){
+        pawn_attacks[SIDE_WHITE][i] = generate_pawn_attack(i, SIDE_WHITE);
+        pawn_attacks[SIDE_BLACK][i] = generate_pawn_attack(i, SIDE_BLACK);
+    }
+}
+
+uint64_t generate_knight_attack(uint8_t pos){
+    uint8_t x = pos % 8;
+    uint8_t y = pos / 8;
+    uint64_t rtn = 0;
+    static const int dx[8] = { 2, 2, 1,-1,-2,-2,-1, 1 };
+    static const int dy[8] = {-1, 1, 2, 2, 1,-1,-2,-2};
+    for (int i = 0; i < 8; i++){
+        int nx = x + dx[i];
+        int ny = y + dy[i];
+
+        if (0 <= nx && nx < 8 && 0 <= ny && ny < 8){
+            rtn |= 1ULL << XY_TO_1D(nx, ny);
+        }
+    }
+
+    return rtn;
+}
+
+uint64_t generate_king_attack(uint8_t pos){
+    uint8_t x = pos % 8;
+    uint8_t y = pos / 8;
+    uint64_t rtn = 0;
+    static const int dx[8] = { 0, 1, 1,  1,  0, -1, -1, -1 };
+    static const int dy[8] = { 1, 1, 0, -1, -1, -1,  0,  1 };
+    for(int i = 0; i < 8; i++){
+        int nx = x + dx[i];
+        int ny = y + dy[i];
+        if (0 <= nx && nx < 8 && 0 <= ny && ny < 8){
+            rtn |= 1ULL << XY_TO_1D(nx, ny);
+        }
+    }
+    return rtn;
+}
+
+uint64_t generate_pawn_attack(uint8_t pos, uint8_t side){
+    uint8_t x = pos % 8;
+    uint8_t y = pos / 8;
+    uint64_t rtn = 0;
+    if (x > 0 && y < 7 && side == SIDE_WHITE){
+        rtn |= 1ULL << XY_TO_1D((x - 1), (y + 1));
+    }
+    if (x > 0 && y > 0 && side == SIDE_BLACK){
+        rtn |= 1ULL << XY_TO_1D((x - 1), (y - 1));
+    }
+    if (x < 7 && y < 7 && side == SIDE_WHITE){
+        rtn |= 1ULL << XY_TO_1D((x + 1), (y + 1));
+    }
+    if (x < 7 && y > 0 && side == SIDE_BLACK){
+        rtn |= 1ULL << XY_TO_1D((x + 1), (y - 1));
+    }
+    return rtn;
+}
+
+uint64_t generate_rook_relevant_mask(uint8_t pos){
+    uint8_t x = pos % 8;
+    uint8_t y = pos / 8;
+    uint64_t rtn = 0;
+    for(int nx = x - 1; nx >= 1; nx--) rtn |= 1ULL << (XY_TO_1D(nx, y));
+    for(int nx = x + 1; nx <= 6; nx++) rtn |= 1ULL << (XY_TO_1D(nx, y));
+    for(int ny = y - 1; ny >= 1; ny--) rtn |= 1ULL << (XY_TO_1D(x, ny));
+    for(int ny = y + 1; ny <= 6; ny++) rtn |= 1ULL << (XY_TO_1D(x, ny));
+    return rtn;
+}
+
+uint64_t generate_rook_attacks(uint8_t pos, uint64_t occupancy){
+    uint8_t x = pos % 8;
+    uint8_t y = pos / 8;
+    uint64_t rtn = 0;
+    // south
+    for(int ny = y - 1; ny >= 0; ny--){
+        int sq = XY_TO_1D(x, ny);
+        rtn |= 1ULL << sq;
+        if (BOARD_GET_1D(occupancy, sq)){
+            break;
+        }
+    }
+    // north
+    for(int ny = y + 1; ny <= 7; ny++){
+        int sq = XY_TO_1D(x, ny);
+        rtn |= 1ULL << sq;
+        if (BOARD_GET_1D(occupancy, sq)){
+            break;
+        }
+    }
+    // west
+    for (int nx = x - 1; nx >= 0; nx--){
+        int sq = XY_TO_1D(nx, y);
+        rtn |= 1ULL << sq;
+        if (BOARD_GET_1D(occupancy, sq)){
+            break;
+        }
+    }
+    // east
+    for (int nx = x + 1; nx <= 7; nx++){
+        int sq = XY_TO_1D(nx, y);
+        rtn |= 1ULL << sq;
+        if (BOARD_GET_1D(occupancy, sq)){
+            break;
+        }
+    }
+    return rtn;
+}
+
+uint64_t generate_bishop_relevant_mask(uint8_t pos){
+    uint8_t x = pos % 8;
+    uint8_t y = pos / 8;
+    uint64_t rtn = 0;
+    for (int nx = x + 1, ny = y + 1; nx <= 6 && ny <= 6; nx++, ny++) rtn |= 1ULL << (XY_TO_1D(nx, ny));
+    for (int nx = x - 1, ny = y + 1; nx >= 1 && ny <= 6; nx--, ny++) rtn |= 1ULL << (XY_TO_1D(nx, ny));
+    for (int ny = y - 1, nx = x - 1; ny >= 1 && nx >= 1; ny--, nx--) rtn |= 1ULL << (XY_TO_1D(nx, ny));
+    for (int ny = y - 1, nx = x + 1; ny >= 1 && nx <= 6; ny--, nx++) rtn |= 1ULL << (XY_TO_1D(nx, ny));
+    return rtn;
+}
+
+uint64_t generate_bishop_attacks(uint8_t pos, uint64_t occupancy){
+    uint8_t x = pos % 8;
+    uint8_t y = pos / 8;
+    uint64_t rtn = 0;
+    // north-east
+    for(int nx = x + 1, ny = y + 1; nx <= 7 && ny <= 7; nx++, ny++){
+        int sq = XY_TO_1D(nx, ny);
+        rtn |= 1ULL << sq;
+        if (BOARD_GET_1D(occupancy, sq)){
+            break;
+        }
+    }
+    // north-west
+    for(int nx = x - 1, ny = y + 1; nx >= 0 && ny <= 7; nx--, ny++){
+        int sq = XY_TO_1D(nx, ny);
+        rtn |= 1ULL << sq;
+        if (BOARD_GET_1D(occupancy, sq)){
+            break;
+        }
+    }
+    // south-east
+    for (int nx = x + 1, ny = y - 1; nx <= 7 && ny >= 0; nx++, ny--){
+        int sq = XY_TO_1D(nx, ny);
+        rtn |= 1ULL << sq;
+        if (BOARD_GET_1D(occupancy, sq)) {
+            break;
+        }
+    }
+    // south-west
+    for(int nx = x - 1, ny = y - 1; nx >= 0 && ny >= 0; nx--, ny--){
+        int sq = XY_TO_1D(nx, ny);
+        rtn |= 1ULL << sq;
+        if (BOARD_GET_1D(occupancy, sq)){
+            break;
+        }
+    }
+    return rtn;
+}
+
+uint64_t generate_queen_relevant_mask(uint8_t pos){
+    return generate_bishop_relevant_mask(pos) |
+           generate_rook_relevant_mask(pos);
+}
+
+uint64_t generate_queen_attacks(uint8_t pos, uint64_t occupancy){
+    return generate_bishop_attacks(pos, occupancy) |
+        generate_rook_attacks(pos, occupancy);
+}
