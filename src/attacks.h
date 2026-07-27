@@ -19,4 +19,7 @@ uint64_t generate_rook_attacks(uint8_t pos, uint64_t occupancy);
 uint64_t generate_bishop_attacks(uint8_t pos, uint64_t occupancy);
 uint64_t generate_queen_attacks(uint8_t pos, uint64_t occupancy);
 
+uint64_t lookup_rook_attacks(uint8_t square, uint64_t occupancy);
+uint64_t lookup_bishop_attacks(uint8_t square, uint64_t occupancy);
+
 #endif

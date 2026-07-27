@@ -324,7 +324,7 @@ write:
     fprintf(f, "MagicEntry bishop_magics[64] = {\n");
     for(int i = 0; i < 64; i++){
         fprintf(f, "\t[%d] = { .mask = 0x%016llXULL, .magic = 0x%016llXULL, ", i, bishops[i].mask, bishops[i].magic);
-        fprintf(f, ".table = rook_table_sq%d, .shift = %d},\n", i, bishops[i].shift);
+        fprintf(f, ".table = bishop_table_sq%d, .shift = %d},\n", i, bishops[i].shift);
     }
     fprintf(f, "};\n");
     fclose(f);
