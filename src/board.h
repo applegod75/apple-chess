@@ -51,38 +51,4 @@ uint64_t board_set_low(uint64_t base, uint8_t x, uint8_t y);
 int board_get(uint64_t base, uint8_t x, uint8_t y);
 void board_setup(uint64_t pos_boards[12], uint64_t occupancy_boards[3]);
 
-#pragma pack(push, 1)
-typedef struct {
-    uint64_t position_boards[12];
-    uint64_t occupied[3];
-    int side;
-    uint8_t castling;
-    int en_passant;
-    uint64_t hash;
-} Position;
-
-typedef struct {
-    uint8_t from;
-    uint8_t to;
-
-    uint8_t piece;
-    uint8_t captured;
-} Move;
-
-typedef struct {
-    uint8_t captured;
-    uint8_t castling;
-    int en_passant;
-    uint64_t hash;
-} Undo;
-#pragma pack(pop)
-
-void set_piece(Position* pos, uint8_t p, int piece);
-void remove_piece(Position* pos, uint8_t p, int piece);
-void move_piece(Position* pos, Move mov);
-void position_setup(Position* pos);
-void make_move(Position* pos, Move mov, Undo* undo);
-void unmake_move(Position* pos, Move mov, Undo* undo);
-void update_occupancy(Position* pos);
-
 #endif
