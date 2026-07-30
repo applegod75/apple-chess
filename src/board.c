@@ -5,7 +5,7 @@ uint64_t board_flip(uint64_t base, uint8_t x, uint8_t y){
     return base ^ ((uint64_t)1 << shiftAmount);
 }
 
-int board_get(uint64_t base, uint8_t x, uint8_t y){
+uint8_t board_get(uint64_t base, uint8_t x, uint8_t y){
     uint64_t position = XY_TO_1D(x, y);
     return (base & ((uint64_t)1 << position)) > 0;
 }
