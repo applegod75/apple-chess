@@ -5,22 +5,62 @@
 #include "board.h"
 #include "attacks.h"
 
-#define CASTLE_WHITE 1
-#define CASTLE_BLACK 2
-#define CASTLE_NONE  0
+#define CASTLE_WHITE_Q 1
+#define CASTLE_WHITE_K 2
+#define CASTLE_BLACK_Q 4
+#define CASTLE_BLACK_K 8
+#define CASTLE_NONE    0
+
+#define MOVETYPE_QUIET 1
+#define MOVETYPE_ALL 2
+#define MOVETYPE_CAPTURE 4
+
+#define MVFLAG_DOUBLE_PUSH 1
+#define MVFLAG_EN_PASSANT 2
+#define MVFLAG_CASTLE_K 4
+#define MVFLAG_CASTLE_Q 8
 
 typedef struct {
     uint8_t piece;
     uint8_t from;
     uint8_t to;
     uint8_t captured_piece;
+    uint8_t promote_to;
+    // MVFLAG_*
+    uint8_t flags;
+    uint8_t prev_en_passant;
+    uint8_t prev_castling;
 } Move;
 
 typedef struct {
     uint64_t board[12];
     uint64_t occupancy[3];
+    // the square on which a pawn stands that can be taken by en passant.
+    // if there is no possibility for en passant, this is 255
     uint8_t en_passant;
-
+    uint8_t castling;
+    uint8_t current_side;
 } State;
+
+typedef struct {
+    Move moves[256];
+    size_t count;
+} MoveList;
+
+typedef struct {
+    uint64_t pawns[2][64];
+    uint64_t knights[64];
+    uint64_t kings[64];
+} PrecomputedAttacks;
+
+void generate_psuedo_moves(State* state, MoveList* ml, PrecomputedAttacks* attacks);
+void generate_pawn_moves(State* state, MoveList* ml, PrecomputedAttacks* attacks);
+void generate_queen_moves(State* state, MoveList* ml);
+void generate_rook_moves(State* state, MoveList* ml);
+void generate_bishop_moves(State* state, MoveList* ml);
+void generate_king_moves(State* state, MoveList* ml, PrecomputedAttacks* attacks);
+void generate_knight_moves(State* state, MoveList* ml, PrecomputedAttacks* attacks);
+
+static inline void precompute_attacks(PrecomputedAttacks* attacks);
 
 #endif
