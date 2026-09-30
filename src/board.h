@@ -46,9 +46,11 @@
 #define BOARD_SET_HIGH_1D(_BASE, _POS) (_BASE | ((uint64_t)1 << _POS))
 
 uint64_t board_flip(uint64_t base, uint8_t x, uint8_t y);
-uint64_t board_set_high(uint64_t base, uint8_t x, uint8_t y);
-uint64_t board_set_low(uint64_t base, uint8_t x, uint8_t y);
+void board_set_high(uint64_t* base, uint8_t x, uint8_t y);
+void board_set_low(uint64_t* base, uint8_t x, uint8_t y);
 uint8_t board_get(uint64_t base, uint8_t x, uint8_t y);
 void board_setup(uint64_t pos_boards[12], uint64_t occupancy_boards[3]);
+
+void update_occupancy(uint64_t pos[12], uint64_t occupancies[3]);
 
 #endif

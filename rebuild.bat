@@ -1,7 +1,5 @@
 @echo off
 
-REM use this script if the makefile fails, do note that this performs a full rebuild every time
-
 SETLOCAL ENABLEDELAYEDEXPANSION
 
 if "%~1"=="" (

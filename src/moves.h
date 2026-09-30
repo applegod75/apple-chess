@@ -61,6 +61,11 @@ void generate_bishop_moves(State* state, MoveList* ml);
 void generate_king_moves(State* state, MoveList* ml, PrecomputedAttacks* attacks);
 void generate_knight_moves(State* state, MoveList* ml, PrecomputedAttacks* attacks);
 
-static inline void precompute_attacks(PrecomputedAttacks* attacks);
+void make_move(State* state, Move* move);
+void unmake_move(State* state, Move* move);
+
+void precompute_attacks(PrecomputedAttacks* attacks);
+
+void generate_legal_moves(State* state, MoveList* ml, PrecomputedAttacks* attacks);
 
 #endif

@@ -199,7 +199,8 @@ void write_magicdump_header(FILE* f){
     fprintf(f, "\tuint64_t shift;\n");
     fprintf(f, "} MagicEntry;\n\n");
     fprintf(f, "extern MagicEntry rook_magics[64];\n");
-    fprintf(f, "extern MagicEntry bishop_magics[64];\n\n");
+    fprintf(f, "extern MagicEntry bishop_magics[64];\n");
+    fprintf(f, "extern uint64_t rays[64][64];\n\n");
     fprintf(f, "#endif");
 }
 
@@ -247,6 +248,20 @@ void generate_rook_magic_entries(DumpableMagicEntry rooks[64]){
             };
         }
     }
+}
+
+uint64_t ray_between(int a, int b){
+    uint8_t ax = a % 8;
+    uint8_t ay = a / 8;
+    uint8_t bx = b % 8;
+    uint8_t by = b / 8;
+    if (ax == bx || ay == by){
+        
+
+    } else if (generate_bishop_attacks(XY_TO_1D(ax, ay), 0ULL) & XY_TO_1D(bx, by)){
+        
+    }
+    return 0;
 }
 
 int main(int argc, char** argv){
@@ -317,16 +332,24 @@ write:
 
     fprintf(f, "MagicEntry rook_magics[64] = {\n");
     for (int i = 0; i < 64; i++){
-        fprintf(f, "\t[%d] = { .mask = 0x%016llXULL, .magic = 0x%016llXULL, ", i, rooks[i].mask, rooks[i].magic);
+        fprintf(f, "\t{ .mask = 0x%016llXULL, .magic = 0x%016llXULL, ", i, rooks[i].mask, rooks[i].magic);
         fprintf(f, ".table = rook_table_sq%d, .shift = %d},\n", i, rooks[i].shift);
     }
     fprintf(f, "};\n");
     fprintf(f, "MagicEntry bishop_magics[64] = {\n");
     for(int i = 0; i < 64; i++){
-        fprintf(f, "\t[%d] = { .mask = 0x%016llXULL, .magic = 0x%016llXULL, ", i, bishops[i].mask, bishops[i].magic);
+        fprintf(f, "\t{ .mask = 0x%016llXULL, .magic = 0x%016llXULL, ", i, bishops[i].mask, bishops[i].magic);
         fprintf(f, ".table = bishop_table_sq%d, .shift = %d},\n", i, bishops[i].shift);
     }
     fprintf(f, "};\n");
+
+    // fprintf(f, "uint64_t rays[64][64] = {\n");
+    // for (int i = 0; i < 64; i++){
+    //     fprintf(f, "[%d] = {", i);
+    //     for (int j = 0; j < 64; j++){
+    //         fprintf(f, "");
+    //     }
+    // }
     fclose(f);
 
     return 0;

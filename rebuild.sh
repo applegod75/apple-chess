@@ -1,5 +1,4 @@
 #!/usr/bin/bash
-# use this script if the makefile fails, do note that this performs a full rebuild every time
 
 rm -rf build
 

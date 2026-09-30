@@ -1,8 +1,8 @@
 #include "board.h"
 
 uint64_t board_flip(uint64_t base, uint8_t x, uint8_t y){
-    uint64_t shiftAmount = XY_TO_1D(x, y);
-    return base ^ ((uint64_t)1 << shiftAmount);
+    uint64_t pos = XY_TO_1D(x, y);
+    return base ^ ((uint64_t)1 << pos);
 }
 
 uint8_t board_get(uint64_t base, uint8_t x, uint8_t y){
@@ -10,58 +10,57 @@ uint8_t board_get(uint64_t base, uint8_t x, uint8_t y){
     return (base & ((uint64_t)1 << position)) > 0;
 }
 
-uint64_t board_set_high(uint64_t base, uint8_t x, uint8_t y){
-    uint64_t shiftAmount = XY_TO_1D(x, y);
-    return base | ((uint64_t)1 << shiftAmount);
+void board_set_high(uint64_t* base, uint8_t x, uint8_t y){
+    uint64_t pos = XY_TO_1D(x, y);
+    *base = BOARD_SET_HIGH_1D(*base, pos);
 }
 
-uint64_t board_set_low(uint64_t base, uint8_t x, uint8_t y){
+void board_set_low(uint64_t* base, uint8_t x, uint8_t y){
     uint64_t position = XY_TO_1D(x, y);
-    if (BOARD_GET_1D(base, position)) return BOARD_FLIP_1D(base, position);
-    return base;
+    *base = ((*base) & (~(1ULL << position)));
 }
 
 void board_setup(uint64_t pos_boards[12], uint64_t occupancy_boards[3]){
     memset(pos_boards, 0, 12 * sizeof(uint64_t));
     // kings
-    pos_boards[PIECE_WKING] = board_set_high(pos_boards[PIECE_WKING], 4, 0);
-    pos_boards[PIECE_BKING] = board_set_high(pos_boards[PIECE_BKING], 4, 7);
+    board_set_high(&pos_boards[PIECE_WKING], 4, 0);
+    board_set_high(&pos_boards[PIECE_BKING], 4, 7);
     // queens
-    pos_boards[PIECE_WQUEEN] = board_set_high(pos_boards[PIECE_WQUEEN], 3, 0);
-    pos_boards[PIECE_BQUEEN] = board_set_high(pos_boards[PIECE_BQUEEN], 3, 7);
+    board_set_high(&pos_boards[PIECE_WQUEEN], 3, 0);
+    board_set_high(&pos_boards[PIECE_BQUEEN], 3, 7);
     // rooks
-    pos_boards[PIECE_WROOK] = board_set_high(pos_boards[PIECE_WROOK], 0, 0);
-    pos_boards[PIECE_WROOK] = board_set_high(pos_boards[PIECE_WROOK], 7, 0);
-    pos_boards[PIECE_BROOK] = board_set_high(pos_boards[PIECE_BROOK], 0, 7);
-    pos_boards[PIECE_BROOK] = board_set_high(pos_boards[PIECE_BROOK], 7, 7);
+    board_set_high(&pos_boards[PIECE_WROOK], 0, 0);
+    board_set_high(&pos_boards[PIECE_WROOK], 7, 0);
+    board_set_high(&pos_boards[PIECE_BROOK], 0, 7);
+    board_set_high(&pos_boards[PIECE_BROOK], 7, 7);
     // bishops
-    pos_boards[PIECE_WBISHOP] = board_set_high(pos_boards[PIECE_WBISHOP], 2, 0);
-    pos_boards[PIECE_WBISHOP] = board_set_high(pos_boards[PIECE_WBISHOP], 5, 0);
-    pos_boards[PIECE_BBISHOP] = board_set_high(pos_boards[PIECE_BBISHOP], 2, 7);
-    pos_boards[PIECE_BBISHOP] = board_set_high(pos_boards[PIECE_BBISHOP], 5, 7);
+    board_set_high(&pos_boards[PIECE_WBISHOP], 2, 0);
+    board_set_high(&pos_boards[PIECE_WBISHOP], 5, 0);
+    board_set_high(&pos_boards[PIECE_BBISHOP], 2, 7);
+    board_set_high(&pos_boards[PIECE_BBISHOP], 5, 7);
     // knights
-    pos_boards[PIECE_WKNIGHT] = board_set_high(pos_boards[PIECE_WKNIGHT], 1, 0);
-    pos_boards[PIECE_WKNIGHT] = board_set_high(pos_boards[PIECE_WKNIGHT], 6, 0);
-    pos_boards[PIECE_BKNIGHT] = board_set_high(pos_boards[PIECE_BKNIGHT], 1, 7);
-    pos_boards[PIECE_BKNIGHT] = board_set_high(pos_boards[PIECE_BKNIGHT], 6, 7);
+    board_set_high(&pos_boards[PIECE_WKNIGHT], 1, 0);
+    board_set_high(&pos_boards[PIECE_WKNIGHT], 6, 0);
+    board_set_high(&pos_boards[PIECE_BKNIGHT], 1, 7);
+    board_set_high(&pos_boards[PIECE_BKNIGHT], 6, 7);
     // white pawns
-    pos_boards[PIECE_WPAWN] = board_set_high(pos_boards[PIECE_WPAWN], 0, 1);
-    pos_boards[PIECE_WPAWN] = board_set_high(pos_boards[PIECE_WPAWN], 1, 1);
-    pos_boards[PIECE_WPAWN] = board_set_high(pos_boards[PIECE_WPAWN], 2, 1);
-    pos_boards[PIECE_WPAWN] = board_set_high(pos_boards[PIECE_WPAWN], 3, 1);
-    pos_boards[PIECE_WPAWN] = board_set_high(pos_boards[PIECE_WPAWN], 4, 1);
-    pos_boards[PIECE_WPAWN] = board_set_high(pos_boards[PIECE_WPAWN], 5, 1);
-    pos_boards[PIECE_WPAWN] = board_set_high(pos_boards[PIECE_WPAWN], 6, 1);
-    pos_boards[PIECE_WPAWN] = board_set_high(pos_boards[PIECE_WPAWN], 7, 1);
+    board_set_high(&pos_boards[PIECE_WPAWN], 0, 1);
+    board_set_high(&pos_boards[PIECE_WPAWN], 1, 1);
+    board_set_high(&pos_boards[PIECE_WPAWN], 2, 1);
+    board_set_high(&pos_boards[PIECE_WPAWN], 3, 1);
+    board_set_high(&pos_boards[PIECE_WPAWN], 4, 1);
+    board_set_high(&pos_boards[PIECE_WPAWN], 5, 1);
+    board_set_high(&pos_boards[PIECE_WPAWN], 6, 1);
+    board_set_high(&pos_boards[PIECE_WPAWN], 7, 1);
     // black pawns
-    pos_boards[PIECE_BPAWN] = board_set_high(pos_boards[PIECE_BPAWN], 0, 6);
-    pos_boards[PIECE_BPAWN] = board_set_high(pos_boards[PIECE_BPAWN], 1, 6);
-    pos_boards[PIECE_BPAWN] = board_set_high(pos_boards[PIECE_BPAWN], 2, 6);
-    pos_boards[PIECE_BPAWN] = board_set_high(pos_boards[PIECE_BPAWN], 3, 6);
-    pos_boards[PIECE_BPAWN] = board_set_high(pos_boards[PIECE_BPAWN], 4, 6);
-    pos_boards[PIECE_BPAWN] = board_set_high(pos_boards[PIECE_BPAWN], 5, 6);
-    pos_boards[PIECE_BPAWN] = board_set_high(pos_boards[PIECE_BPAWN], 6, 6);
-    pos_boards[PIECE_BPAWN] = board_set_high(pos_boards[PIECE_BPAWN], 7, 6);
+    board_set_high(&pos_boards[PIECE_BPAWN], 0, 6);
+    board_set_high(&pos_boards[PIECE_BPAWN], 1, 6);
+    board_set_high(&pos_boards[PIECE_BPAWN], 2, 6);
+    board_set_high(&pos_boards[PIECE_BPAWN], 3, 6);
+    board_set_high(&pos_boards[PIECE_BPAWN], 4, 6);
+    board_set_high(&pos_boards[PIECE_BPAWN], 5, 6);
+    board_set_high(&pos_boards[PIECE_BPAWN], 6, 6);
+    board_set_high(&pos_boards[PIECE_BPAWN], 7, 6);
     // occupancy
     occupancy_boards[OCCUPIED_WHITE] = (
         pos_boards[PIECE_WPAWN]   |
@@ -82,4 +81,28 @@ void board_setup(uint64_t pos_boards[12], uint64_t occupancy_boards[3]){
     occupancy_boards[OCCUPIED_BOTH] = (
         occupancy_boards[OCCUPIED_BLACK] | occupancy_boards[OCCUPIED_WHITE]
     );
+}
+
+void update_occupancy(uint64_t pos[12], uint64_t occupancies[3]){
+    occupancies[OCCUPIED_WHITE] = (
+        pos[PIECE_WPAWN] |
+        pos[PIECE_WKNIGHT] |
+        pos[PIECE_WBISHOP] |
+        pos[PIECE_WROOK] |
+        pos[PIECE_WQUEEN] |
+        pos[PIECE_WKING]
+    );
+
+    occupancies[OCCUPIED_BLACK] = (
+        pos[PIECE_BPAWN] |
+        pos[PIECE_BKNIGHT] |
+        pos[PIECE_BBISHOP] |
+        pos[PIECE_BROOK] |
+        pos[PIECE_BQUEEN] |
+        pos[PIECE_BKING]
+    );
+
+    occupancies[OCCUPIED_BOTH] = 
+        occupancies[OCCUPIED_BLACK] |
+        occupancies[OCCUPIED_WHITE];
 }
